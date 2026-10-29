@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arbor Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f3f0fa; --surface:#ffffff; --ink:#1b1233; --muted:#6c6485; --line:#e4def2;
+  --card1:#2b1259; --card2:#6a3fd6; --accent:#6a3fd6; --accent-ink:#fff;
+  --in:#0e9f6e; --out:#e5484d; --soft:#ece7f9;
+  --shadow:0 20px 40px -24px rgba(43,18,89,.45);
+  --display:"Sora","Trebuchet MS",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e0a1c; --surface:#181230; --ink:#f1edff; --muted:#a398c4; --line:#2a2250;
+    --accent:#9b7bff; --accent-ink:#0e0a1c; --in:#3ddc97; --out:#ff7b80; --soft:#241b46;
+    --shadow:0 20px 40px -24px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e0a1c; --surface:#181230; --ink:#f1edff; --muted:#a398c4; --line:#2a2250;
+  --accent:#9b7bff; --accent-ink:#0e0a1c; --in:#3ddc97; --out:#ff7b80; --soft:#241b46;
+  --shadow:0 20px 40px -24px rgba(0,0,0,.8);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.45;min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{max-width:520px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom,0px))}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-family:var(--display);font-weight:700;color:var(--accent);flex:none}
+.top .hi{flex:1;min-width:0}
+.top small{color:var(--muted);display:block}
+.top strong{font-family:var(--display);font-size:1.05rem}
+.ibtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center}
+.ibtn svg,.nav svg,.act svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.card{position:relative;overflow:hidden;border-radius:28px;padding:22px;color:#fff;background:linear-gradient(135deg,var(--card1),var(--card2));box-shadow:var(--shadow)}
+.card::after{pointer-events:none;content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;border:34px solid rgba(255,255,255,.08)}
+.card .lbl{display:flex;justify-content:space-between;align-items:center;opacity:.85;font-size:.92rem}
+.eye{background:rgba(255,255,255,.16);border:0;border-radius:10px;width:36px;height:36px;color:#fff;cursor:pointer;display:grid;place-items:center;position:relative;z-index:1}
+.eye svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bal{font-family:var(--display);font-weight:700;font-size:clamp(2rem,9vw,2.7rem);letter-spacing:-.03em;margin:8px 0 14px}
+.acct{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;opacity:.9}
+.copy{background:none;border:0;color:#fff;cursor:pointer;font-weight:600;padding:6px 0;position:relative;z-index:1;text-decoration:underline;text-underline-offset:3px}
+
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 22px}
+.act{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 8px;display:grid;justify-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:.92rem}
+.act span.i{width:44px;height:44px;border-radius:14px;background:var(--soft);color:var(--accent);display:grid;place-items:center}
+.act:active{transform:scale(.97)}
+
+h2{font-family:var(--display);font-size:1.05rem;margin:0}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.link{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:8px 0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:22px}
+.bars{display:grid;gap:12px}
+.bar .r{display:flex;justify-content:space-between;font-size:.92rem;margin-bottom:5px}
+.bar .r span:last-child{color:var(--muted)}
+.bar .t{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:var(--accent);transition:width .5s}
+
+.tx{list-style:none;margin:0;padding:0}
+.tx li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.tx li:last-child{border-bottom:0}
+.tx .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:var(--soft);color:var(--accent);flex:none}
+.tx .m{flex:1;min-width:0}
+.tx .m b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .m small{color:var(--muted)}
+.amt{font-family:var(--display);font-weight:600;font-size:.98rem;white-space:nowrap}
+.amt.in{color:var(--in)} .amt.out{color:var(--out)}
+.empty{color:var(--muted);text-align:center;padding:24px 0}
+.chips{display:flex;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:99px;padding:8px 16px;min-height:40px;cursor:pointer;color:var(--muted);font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.view[hidden]{display:none}
+
+.navbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
+.navin{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.nav{background:none;border:0;border-radius:14px;min-height:52px;display:grid;justify-items:center;align-content:center;gap:2px;color:var(--muted);cursor:pointer;font-size:.78rem;font-weight:600}
+.nav[aria-current="page"]{color:var(--accent);background:var(--soft)}
+
+.scrim{position:fixed;inset:0;background:rgba(14,10,28,.55);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.scrim.open{display:flex}
+.sheet{width:100%;max-width:520px;background:var(--surface);border-radius:28px 28px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px));animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet h2{font-size:1.2rem;margin-bottom:14px}
+label{display:block;font-weight:600;font-size:.9rem;margin:12px 0 6px}
+.f{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:0 14px;min-height:50px}
+.big{font-family:var(--display);font-size:1.5rem;font-weight:600}
+.err{color:var(--out);font-size:.9rem;min-height:1.3em;margin:8px 0 0}
+.go{width:100%;margin-top:10px;min-height:54px;border:0;border-radius:16px;background:var(--accent);color:var(--accent-ink);font-weight:700;cursor:pointer}
+.cancel{width:100%;margin-top:6px;min-height:44px;border:0;background:none;color:var(--muted);cursor:pointer;font-weight:600}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-30px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:.25s;font-weight:500;z-index:20}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+.login{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--card1),var(--card2));color:#fff}
+.lhead{padding:56px 24px 34px;max-width:520px;width:100%;margin:0 auto}
+.logo{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin-bottom:22px}
+.logo svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.lhead h1{font-family:var(--display);font-size:clamp(1.9rem,8vw,2.5rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 8px}
+.lhead p{margin:0;opacity:.8}
+.lbody{flex:1;background:var(--bg);color:var(--ink);border-radius:28px 28px 0 0;padding:26px 22px calc(28px + env(safe-area-inset-bottom,0px))}
+.lform{max-width:480px;margin:0 auto}
+.pw{position:relative}.pw .f{padding-right:72px}
+.showpw{position:absolute;right:6px;top:6px;min-height:38px;padding:0 12px;border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer}
+.lrow{display:flex;justify-content:flex-end}
+.go:disabled{opacity:.8;cursor:wait}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:10px;vertical-align:-3px;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#escrim{align-items:center;padding:20px;z-index:15}
+.ebox{text-align:center;border-radius:28px;max-width:400px;padding:28px 22px 18px}
+.ebox h2{margin-bottom:8px}
+.ebox p{margin:0 0 14px;color:var(--muted)}
+.eic{width:68px;height:68px;border-radius:50%;background:color-mix(in srgb,var(--out) 16%,transparent);color:var(--out);display:grid;place-items:center;margin:0 auto 16px;box-shadow:0 0 0 8px color-mix(in srgb,var(--out) 8%,transparent)}
+.eic svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.eref{display:inline-block;background:var(--soft);color:var(--muted);border-radius:99px;padding:5px 14px;font-size:.84rem;margin-bottom:18px}
+.eref b{color:var(--ink);letter-spacing:.04em}
+.pcard{position:relative;aspect-ratio:1.586;border-radius:24px;padding:20px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,#8a63ff 0%,transparent 55%),linear-gradient(135deg,#1b1233,#35198a);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:16px;transition:filter .3s}
+.pc-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-weight:700;font-size:1.1rem;letter-spacing:-.02em}
+.pc-top small{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:.12em;margin-left:6px}
+.pc-net{display:flex}.pc-net i{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85)}.pc-net i+i{background:rgba(255,183,3,.9);margin-left:-12px}
+.chip-ic{width:44px;height:34px;border-radius:8px;background:linear-gradient(135deg,#f6d77a,#c99a2e);position:relative}
+.chip-ic::after{content:"";position:absolute;inset:7px 10px;border:1.5px solid rgba(0,0,0,.25);border-radius:4px}
+.pc-num{font-family:var(--display);font-size:clamp(1.05rem,5.2vw,1.4rem);letter-spacing:.06em;font-weight:600}
+.pc-row{display:flex;gap:18px;font-size:.82rem}.pc-row small{display:block;opacity:.7;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em}.pc-row b{font-weight:600;letter-spacing:.04em}
+.pcard.frozen{filter:grayscale(.85) brightness(.75)}
+.pc-frozen{display:none;position:absolute;inset:0;place-items:center;background:rgba(10,8,20,.35);backdrop-filter:blur(3px);font-family:var(--display);font-weight:700;font-size:1.2rem}
+.pcard.frozen .pc-frozen{display:grid}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.trow:last-child{border:0}.trow small{display:block;color:var(--muted)}.trow b{font-weight:600}
+.sw{width:50px;height:30px;border-radius:99px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw[aria-checked="true"]{background:var(--accent)}.sw[aria-checked="true"]::after{transform:translateX(20px)}
+.svc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.svcb{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;font-weight:600;font-size:.92rem}
+.svcb .i{width:40px;height:40px;border-radius:12px;background:var(--soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.svcb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#ibody .m b{white-space:normal}
+.note{color:var(--muted);font-size:.86rem;text-align:center;margin:18px 0 0}
+@media (min-width:560px){.scrim{align-items:center}.sheet{border-radius:28px}.lbody{border-radius:28px;margin:0 auto 40px;max-width:520px;width:100%}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<section class="login" id="login">
+  <div class="lhead">
+    <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M12 13c-4 0-6-2-6-6 4 0 6 2 6 6z"/><path d="M12 16c3 0 5-1.5 5-5-3 0-5 1.5-5 5z"/></svg></div>
+    <h1>Welcome to Arbor Bank</h1>
+    <p>Sign in to manage your money.</p>
+  </div>
+  <div class="lbody">
+    <form class="lform" id="lform" novalidate>
+      <label for="email">Email</label>
+      <input class="f" id="email" type="email" autocomplete="username" placeholder="name@example.com">
+      <label for="pw">Password</label>
+      <div class="pw"><input class="f" id="pw" type="password" autocomplete="current-password" placeholder="Enter your password"><button type="button" class="showpw" id="showpw" aria-label="Show or hide password">Show</button></div>
+      
+      <p class="err" id="lerr" role="alert"></p>
+      <button class="go" id="lbtn" type="submit">Sign in</button>
+      
+    </form>
+  </div>
+</section>
+<div class="app" id="app" hidden>
+  <div class="top">
+    <div class="avatar" aria-hidden="true">EM</div>
+    <div class="hi"><small id="greet">Good day</small><strong>Elizabeth Kimberly Mayber</strong></div>
+    <button class="ibtn" id="theme" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    <button class="ibtn" id="out2" aria-label="Log out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
+  </div>
+
+  <main>
+    <section class="view" id="v-home">
+      <div class="card">
+        <div class="lbl"><span>Available balance</span>
+          <button class="eye" id="eye" aria-label="Hide or show balance"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+        <div class="bal" id="bal">$0.00</div>
+        <div class="acct"><span>Checking · •••• 7390</span><button class="copy" id="copy">Copy number</button></div>
+      </div>
+      <div class="acts">
+        <button class="act" data-mode="send"><span class="i"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>Send</button>
+        <button class="act" data-mode="add"><span class="i"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>Add money</button>
+        <button class="act" data-mode="bill"><span class="i"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span>Pay bill</button>
+      </div>
+      <div class="sec"><h2>Services</h2></div>
+      <div class="svc">
+        <button class="svcb" data-info="stmt"><span class="i"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg></span>Statements</button>
+        <button class="svcb" data-info="dd"><span class="i"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/></svg></span>Direct deposit</button>
+        <button class="svcb" data-info="atm"><span class="i"><svg viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>Branches &amp; ATMs</button>
+        <button class="svcb" data-info="help"><span class="i"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg></span>Support</button>
+      </div>
+      <div class="sec"><h2 id="sph">Spending</h2></div>
+      <div class="panel"><div class="bars" id="bars"></div></div>
+      <div class="sec"><h2>Savings goals</h2></div>
+      <div class="panel"><div class="bars" id="goals"></div></div>
+      <div class="sec"><h2>Recent activity</h2><button class="link" data-go="activity">See all</button></div>
+      <div class="panel"><ul class="tx" id="recent"></ul></div>
+    </section>
+
+    <section class="view" id="v-activity" hidden>
+      <div class="sec"><h2>All activity</h2></div>
+      <div class="chips" role="group" aria-label="Filter activity">
+        <button class="chip" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="in" aria-pressed="false">Money in</button>
+        <button class="chip" data-f="out" aria-pressed="false">Money out</button>
+      </div>
+      <div class="panel"><ul class="tx" id="all"></ul></div>
+    </section>
+
+    <section class="view" id="v-cards" hidden>
+      <div class="sec"><h2>My cards</h2></div>
+      <div class="pcard" id="pcard">
+        <div class="pc-top"><span>Arbor<small>Debit</small></span><span class="pc-net" aria-hidden="true"><i></i><i></i></span></div>
+        <div class="chip-ic" aria-hidden="true"></div>
+        <div class="pc-num" id="pnum"></div>
+        <div class="pc-row"><div><small>Cardholder</small><b>ELIZABETH K MAYBER</b></div><div><small>Expires</small><b>09/29</b></div><div><small>CVV</small><b id="pcvv"></b></div></div>
+        <div class="pc-frozen">Card frozen</div>
+      </div>
+      <div class="acts">
+        <button class="act" id="cshow"><span class="i"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span id="cshowl">Show details</span></button>
+        <button class="act" id="cfreeze"><span class="i"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><span id="cfreezel">Freeze card</span></button>
+        <button class="act" id="ccopy"><span class="i"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg></span>Copy number</button>
+      </div>
+      <div class="sec"><h2>Card controls</h2></div>
+      <div class="panel">
+        <div class="trow"><div><b>Online purchases</b><small>Websites and apps</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Online purchases"></button></div>
+        <div class="trow"><div><b>Contactless payments</b><small>Tap to pay in stores</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Contactless payments"></button></div>
+        <div class="trow"><div><b>ATM withdrawals</b><small>Cash at any ATM</small></div><button class="sw" role="switch" aria-checked="true" aria-label="ATM withdrawals"></button></div>
+        <div class="trow"><div><b>International use</b><small>Purchases outside the US</small></div><button class="sw" role="switch" aria-checked="false" aria-label="International use"></button></div>
+      </div>
+      <div class="sec"><h2>Daily spending limit</h2></div>
+      <div class="panel"><div class="bar"><div class="r"><span>Spent today</span><span>$1,240 of $5,000</span></div><div class="t"><i style="width:24.8%"></i></div></div></div>
+    </section>
+
+    <section class="view" id="v-account" hidden>
+      <div class="sec"><h2>Account</h2></div>
+      <div class="panel">
+        <ul class="tx">
+          <li><div class="m"><small>Account name</small><b>Elizabeth Kimberly Mayber</b></div></li>
+          <li><div class="m"><small>Account number</small><b>0000 1234 7390</b></div></li>
+          <li><div class="m"><small>Account type</small><b>Checking</b></div></li>
+          <li><div class="m"><small>Routing number</small><b>123 456 780</b></div></li>
+        </ul>
+      </div>
+      <div class="sec" style="margin-top:22px"><h2>Security and alerts</h2></div>
+      <div class="panel">
+        <div class="trow"><div><b>Face ID login</b><small>Sign in with your face</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Face ID login"></button></div>
+        <div class="trow"><div><b>Two-step verification</b><small>Code sent when you sign in</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Two-step verification"></button></div>
+        <div class="trow"><div><b>Transaction alerts</b><small>Push notifications</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Transaction alerts"></button></div>
+        <div class="trow"><div><b>Paperless statements</b><small>E-statements by email</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Paperless statements"></button></div>
+      </div>
+      <button class="go" id="out">Log out</button>
+      
+    </section>
+  </main>
+</div>
+
+<nav class="navbar" id="nav" aria-label="Main" hidden><div class="navin">
+  <button class="nav" data-go="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10H3z"/></svg>Home</button>
+  <button class="nav" data-go="activity"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Activity</button>
+  <button class="nav" data-go="cards"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Cards</button>
+  <button class="nav" data-go="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Account</button>
+</div></nav>
+
+<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="stitle">
+  <h2 id="stitle">Send money</h2>
+  <div id="pick"><label for="to" id="tolbl">Send to</label><select class="f" id="to"></select></div>
+  <label for="amount">Amount (USD)</label>
+  <input class="f big" id="amount" inputmode="decimal" placeholder="0.00" autocomplete="off">
+  <p class="err" id="err" role="alert"></p>
+  <button class="go" id="go">Send money</button>
+  <button class="cancel" id="cancel">Cancel</button>
+</div></div>
+<div class="scrim" id="escrim"><div class="sheet ebox" role="alertdialog" aria-modal="true" aria-labelledby="etitle" aria-describedby="emsg">
+  <div class="eic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg></div>
+  <h2 id="etitle">Transfer failed</h2>
+  <p id="emsg"></p>
+  <div class="eref">Reference no. <b id="ecode"></b></div>
+  <button class="go" id="eclose">Close</button>
+  <button class="cancel" id="eagain" hidden>Try again</button>
+</div></div>
+<div class="scrim" id="iscrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ititle">
+  <h2 id="ititle"></h2>
+  <ul class="tx" id="ibody"></ul>
+  <button class="go" id="iclose">Close</button>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var KEY="arbor.state.v5", THEME="arbor.theme";
+  var $=function(i){return document.getElementById(i)};
+  var CONTACTS=["Emma Johnson","Marcus Lee","Sofia Martinez","Daniel Kim"];
+  var BILLERS=["Electric","Internet","Phone","Water"];
+  var st, hidden=false, mode="send", filter="all";
+
+  function seed(){
+    var n=new Date(2026,0,28,15,42).getTime(), H=36e5, D=24*H;
+    return {bal:989260, tx:[
+      {n:"Payroll — Brightpath Inc",c:"Income",a:3450,t:n-9*D},
+      {n:"Trader Joe’s",c:"Food",a:-84.25,t:n-3*H},
+      {n:"Emma Johnson",c:"Transfers",a:-120,t:n-1*D},
+      {n:"Uber",c:"Transport",a:-23.40,t:n-2*D},
+      {n:"Con Edison",c:"Bills",a:-96.80,t:n-4*D},
+      {n:"Marcus Lee",c:"Income",a:60,t:n-5*D},
+      {n:"Chipotle",c:"Food",a:-14.75,t:n-6*D},
+      {n:"Verizon",c:"Bills",a:-72,t:n-7*D},
+      {n:"Sales tax · Trader Joe’s",c:"Tax",a:-6.74,t:n-3*H-6e4},
+      {n:"Sales tax · Chipotle",c:"Tax",a:-1.18,t:n-6*D-6e4},
+      {n:"Transfer fee · Emma Johnson",c:"Fees",a:-3.5,t:n-1*D-6e4},
+      {n:"Out-of-network ATM fee",c:"Fees",a:-3,t:n-5*D-36e5},
+      {n:"Monthly maintenance fee",c:"Fees",a:-12,t:n-8*D}
+    ]};
+  }
+  function load(){try{var s=localStorage.getItem(KEY);if(s){st=JSON.parse(s);return}}catch(e){} st=seed()}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+  function money(v){return "$"+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+  function when(t){
+    var d=new Date(t), now=new Date(), tm=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+    var diff=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+    if(diff===0)return "Today, "+tm; if(diff===1)return "Yesterday, "+tm;
+    return d.toLocaleDateString([],{month:"short",day:"numeric"})+", "+tm;
+  }
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("show")},2000)}
+
+  function row(x){
+    var li=document.createElement("li");
+    var ic=document.createElement("div");ic.className="ic";
+    ic.textContent=x.n.split(" ").slice(0,2).map(function(w){return w[0]}).join("").toUpperCase();
+    if(x.c==="Tax"||x.c==="Fees"){ic.textContent=x.c==="Tax"?"%":"$";ic.style.background="color-mix(in srgb,var(--out) 14%,transparent)";ic.style.color="var(--out)"}
+    var m=document.createElement("div");m.className="m";
+    var b=document.createElement("b");b.textContent=x.n;
+    var s=document.createElement("small");s.textContent=x.c+" · "+when(x.t);
+    m.appendChild(b);m.appendChild(s);
+    var a=document.createElement("div");a.className="amt "+(x.a>0?"in":"out");
+    a.textContent=(x.a>0?"+":"−")+money(x.a);
+    li.appendChild(ic);li.appendChild(m);li.appendChild(a);return li;
+  }
+  function fill(ul,list){
+    ul.innerHTML="";
+    if(!list.length){var e=document.createElement("li");e.className="empty";e.textContent="No transactions here yet.";ul.appendChild(e);return}
+    list.forEach(function(x){ul.appendChild(row(x))});
+  }
+  function render(){
+    $("bal").textContent=hidden?"$ ••••••":money(st.bal);
+    var list=st.tx.slice().sort(function(a,b){return b.t-a.t});
+    fill($("recent"),list.slice(0,5));
+    fill($("all"),list.filter(function(x){return filter==="all"||(filter==="in"?x.a>0:x.a<0)}));
+    var now=new Date(Math.max.apply(null,st.tx.map(function(x){return x.t}))), sums={};$("sph").textContent="Spending in "+now.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+    st.tx.forEach(function(x){var d=new Date(x.t);
+      if(x.a<0&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())sums[x.c]=(sums[x.c]||0)-x.a});
+    var keys=Object.keys(sums).sort(function(a,b){return sums[b]-sums[a]}), max=sums[keys[0]]||1;
+    var bars=$("bars");bars.innerHTML="";
+    if(!keys.length){bars.innerHTML='<div class="empty">No spending yet this month.</div>'}
+    keys.forEach(function(k){
+      var d=document.createElement("div");d.className="bar";
+      d.innerHTML='<div class="r"><span></span><span></span></div><div class="t"><i></i></div>';
+      d.querySelectorAll("span")[0].textContent=k;
+      d.querySelectorAll("span")[1].textContent=money(sums[k]);
+      d.querySelector("i").style.width=(sums[k]/max*100)+"%";
+      bars.appendChild(d);
+    });
+  }
+
+  function go(v){
+    ["home","activity","cards","account"].forEach(function(n){$("v-"+n).hidden=(n!==v)});
+    document.querySelectorAll(".nav").forEach(function(b){
+      if(b.dataset.go===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  document.querySelectorAll(".chip").forEach(function(b){b.onclick=function(){
+    filter=b.dataset.f;document.querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});render()}});
+
+  function openSheet(m){
+    mode=m;var sel=$("to");sel.innerHTML="";
+    var titles={send:"Send money",add:"Add money",bill:"Pay a bill"};
+    $("stitle").textContent=titles[m];$("go").textContent=titles[m];
+    $("pick").style.display=m==="add"?"none":"block";
+    $("tolbl").textContent=m==="send"?"Send to":"Biller";
+    (m==="send"?CONTACTS:BILLERS).forEach(function(c){var o=document.createElement("option");o.textContent=c;sel.appendChild(o)});
+    $("amount").value="";$("err").textContent="";
+    $("scrim").classList.add("open");setTimeout(function(){$("amount").focus()},50);
+  }
+  function closeSheet(){$("scrim").classList.remove("open")}
+  document.querySelectorAll(".act").forEach(function(b){b.onclick=function(){openSheet(b.dataset.mode)}});
+  $("cancel").onclick=closeSheet;
+  $("scrim").onclick=function(e){if(e.target===$("scrim"))closeSheet()};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+
+  $("go").onclick=function(){
+    if(true){failTx();return}
+    var v=parseFloat(String($("amount").value).replace(/,/g,""));
+    if(!(v>0)){$("err").textContent="Enter an amount greater than $0.";return}
+    if(mode!=="add"&&v>st.bal){$("err").textContent="Not enough balance. You have "+money(st.bal)+".";return}
+    var who=$("to").value, now=Date.now();
+    if(mode==="add"){st.bal+=v;st.tx.push({n:"Top-up",c:"Income",a:v,t:now});toast("Added "+money(v))}
+    else{st.bal-=v;st.tx.push({n:who,c:mode==="send"?"Transfers":"Bills",a:-v,t:now});
+      toast(mode==="send"?"Sent "+money(v)+" to "+who:"Paid "+money(v)+" to "+who)}
+    save();render();closeSheet();
+  };
+  $("amount").addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()});
+  function failTx(){
+    var b=$("go"),label=b.textContent;
+    if(b.disabled)return;
+    b.disabled=true;b.innerHTML='<span class="spin"></span>Processing…';
+    setTimeout(function(){
+      var send=mode==="send";
+      b.disabled=false;b.textContent=label;
+      $("etitle").textContent="Account Locked";
+      $("emsg").textContent="Your account has been locked. To reactivate it, please visit your nearest Arbor Bank branch. We apologize for any inconvenience and thank you for banking with us.";
+      $("ecode").textContent=(mode==="send"?"TRF-":mode==="add"?"DEP-":"BIL-")+(4000+Math.floor(Math.random()*900));
+      closeSheet();$("escrim").classList.add("open");$("eclose").focus();
+    },1500);
+  }
+  function showLocked(prefix){
+    $("etitle").textContent="Account Locked";
+    $("emsg").textContent="Your account has been locked. To reactivate it, please visit your nearest Arbor Bank branch. We apologize for any inconvenience and thank you for banking with us.";
+    $("ecode").textContent=prefix+(4000+Math.floor(Math.random()*900));
+    $("escrim").classList.add("open");$("eclose").focus();
+  }
+  function closeErr(){$("escrim").classList.remove("open")}
+  var INFO={
+    stmt:["Statements",[["Statement cycle","Monthly"],["Delivery","E-statements"],["Latest statement","December 31, 2025"]]],
+    dd:["Direct deposit",[["Account holder","Elizabeth Kimberly Mayber"],["Routing number","123 456 780"],["Account number","0000 1234 7390"],["Account type","Checking"]]],
+    atm:["Branches and ATMs",[["Main Street Branch","120 Main St · Mon–Fri, 9am–5pm"],["Downtown ATM","45 Market St · Open 24 hours"],["Westside Branch","880 Oak Ave · Mon–Sat, 9am–4pm"]]],
+    help:["Support",[["Customer service","1-800-555-0142 · 24/7"],["Lost or stolen card","1-800-555-0199 · 24/7"],["Branch hours","Mon–Fri, 9am–5pm"]]]
+  };
+  document.querySelectorAll("[data-info]").forEach(function(b){b.onclick=function(){showLocked("SVC-");return;
+    var d=INFO[b.dataset.info],ul=$("ibody");ul.innerHTML="";$("ititle").textContent=d[0];
+    d[1].forEach(function(r){var li=document.createElement("li");li.innerHTML='<div class="m"><small></small><b></b></div>';li.querySelector("small").textContent=r[0];li.querySelector("b").textContent=r[1];ul.appendChild(li)});
+    $("iscrim").classList.add("open");$("iclose").focus();
+  }});
+  function closeInfo(){$("iscrim").classList.remove("open")}
+  $("iclose").onclick=closeInfo;
+  $("iscrim").onclick=function(e){if(e.target===$("iscrim"))closeInfo()};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeInfo()});
+
+  [["Emergency fund",12000,15000],["Vacation",3200,5000],["New car",18500,40000]].forEach(function(x){
+    var d=document.createElement("div");d.className="bar";d.innerHTML='<div class="r"><span></span><span></span></div><div class="t"><i></i></div>';
+    var s=d.querySelectorAll("span");s[0].textContent=x[0];s[1].textContent="$"+x[1].toLocaleString("en-US")+" of $"+x[2].toLocaleString("en-US");
+    d.querySelector("i").style.width=(x[1]/x[2]*100)+"%";$("goals").appendChild(d);
+  });
+
+  var shown=false,frozen=false;
+  function cardUI(){
+    $("pnum").textContent=shown?"4000 0012 3456 7390":"•••• •••• •••• 7390";
+    $("pcvv").textContent=shown?"482":"•••";
+    $("cshowl").textContent=shown?"Hide details":"Show details";
+    $("cfreezel").textContent=frozen?"Unfreeze":"Freeze card";
+    $("pcard").classList.toggle("frozen",frozen);
+  }
+  $("cshow").onclick=function(){shown=!shown;cardUI()};
+  $("cfreeze").onclick=function(){frozen=!frozen;cardUI();toast(frozen?"Card frozen":"Card unfrozen")};
+  $("ccopy").onclick=function(){
+    try{navigator.clipboard.writeText("4000001234567390").then(function(){toast("Card number copied")},function(){toast("Couldn’t copy the card number")})}
+    catch(e){toast("Couldn’t copy the card number")}
+  };
+  document.querySelectorAll(".sw").forEach(function(b){b.onclick=function(){
+    var on=b.getAttribute("aria-checked")==="true";b.setAttribute("aria-checked",on?"false":"true");
+    toast(b.getAttribute("aria-label")+(on?" turned off":" turned on"));
+  }});
+  cardUI();
+  $("eclose").onclick=closeErr;
+  $("eagain").onclick=function(){closeErr();openSheet(mode)};
+  $("escrim").onclick=function(e){if(e.target===$("escrim"))closeErr()};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeErr()});
+
+  $("eye").onclick=function(){hidden=!hidden;render()};
+  $("copy").onclick=function(){
+    try{navigator.clipboard.writeText("000012347390").then(function(){toast("Account number copied")},function(){toast("Account number: 0000 1234 7390")})}
+    catch(e){toast("Account number: 0000 1234 7390")}
+  };
+  
+
+  $("theme").onclick=function(){
+    var r=document.documentElement;
+    var dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+    r.dataset.theme=dark?"light":"dark";try{localStorage.setItem(THEME,r.dataset.theme)}catch(e){}
+  };
+  try{var th=localStorage.getItem(THEME);if(th)document.documentElement.dataset.theme=th}catch(e){}
+
+  var h=new Date().getHours();
+  $("greet").textContent=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  function show(on){$("app").hidden=!on;$("nav").hidden=!on;$("login").hidden=on;if(on)window.scrollTo(0,0)}
+  function authed(){try{return sessionStorage.getItem("arbor.auth")==="1"}catch(e){return false}}
+  $("lform").addEventListener("submit",function(e){
+    e.preventDefault();
+    var em=$("email").value.trim(), pw=$("pw").value;
+    if(em.toLowerCase()!=="elizabethkimberlymayber@gmail.com"||pw!=="Eli1234@#wer"){$("lerr").textContent="Wrong password. Please try again.";$("pw").value="";$("pw").focus();return}
+    
+    $("lerr").textContent="";
+    
+    var b=$("lbtn");if(b.disabled)return;b.disabled=true;b.innerHTML='<span class="spin"></span>Signing in…';setTimeout(function(){try{sessionStorage.setItem("arbor.auth","1")}catch(x){}$("pw").value="";b.disabled=false;b.textContent="Sign in";show(true);go("home");render();toast("Signed in")},2000);
+  });
+  $("showpw").onclick=function(){var p=$("pw"),s=p.type==="password";p.type=s?"text":"password";this.textContent=s?"Hide":"Show"};
+  
+  function signOut(){try{sessionStorage.removeItem("arbor.auth")}catch(x){}closeSheet();show(false);window.scrollTo(0,0);toast("You’ve been logged out")}
+  $("out").onclick=signOut;$("out2").onclick=signOut;
+  load();render();show(authed());
+})();
+</script>
+</body>
+</html>
